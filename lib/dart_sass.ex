@@ -87,7 +87,7 @@ defmodule DartSass do
 
   @doc false
   # Latest known version at the time of publishing.
-  def latest_version, do: "1.61.0"
+  def latest_version, do: "1.77.5"
 
   @doc """
   Returns the configured Sass version.
@@ -277,10 +277,11 @@ defmodule DartSass do
 
   defp target_extname(platform) do
     target = target(platform)
+    libc_str = libc_str(platform)
 
     case platform do
       :windows -> "#{target}.zip"
-      _ -> "#{target}.tar.gz"
+      _ -> "#{target}#{libc_str}.tar.gz"
     end
   end
 
@@ -305,6 +306,34 @@ defmodule DartSass do
       "i686" -> "#{platform}-ia32"
       "i386" -> "#{platform}-ia32"
       _ -> raise "dart_sass not available for architecture: #{arch_str}"
+    end
+  end
+
+  @doc """
+  Returns the libc string for Linux platforms.
+  It is appended to the dart-sass archive file name to allow for musl libc support.
+  """
+  def libc_str(:linux) do
+    arch_str = :erlang.system_info(:system_architecture)
+    arch_list = arch_str |> List.to_string() |> String.split("-")
+
+    libc =
+      case length(arch_list) do
+        4 -> arch_list |> List.last()
+        _ -> linux_libc()
+      end
+
+    if libc == "musl", do: "-musl", else: ""
+  end
+
+  def libc_str(_platform), do: ""
+
+  def linux_libc() do
+    try do
+      {output, _} = cmd(["ldd"], ["--version"], stderr_to_stdout: true)
+      if output =~ ~r"^musl libc", do: "musl", else: "gnu"
+    rescue
+      _ -> "gnu"
     end
   end
 

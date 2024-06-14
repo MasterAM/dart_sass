@@ -13,7 +13,7 @@ in dev:
 ```elixir
 def deps do
   [
-    {:dart_sass, "~> 0.6", runtime: Mix.env() == :dev}
+    {:dart_sass, "~> 0.7", runtime: Mix.env() == :dev}
   ]
 end
 ```
@@ -24,7 +24,7 @@ then it only needs to be a dev dependency:
 ```elixir
 def deps do
   [
-    {:dart_sass, "~> 0.6", only: :dev}
+    {:dart_sass, "~> 0.7", only: :dev}
   ]
 end
 ```
@@ -33,7 +33,7 @@ Once installed, change your `config/config.exs` to pick your
 dart_sass version of choice:
 
 ```elixir
-config :dart_sass, version: "1.61.0"
+config :dart_sass, version: "1.77.5"
 ```
 
 Now you can install dart-sass by running:
@@ -68,7 +68,7 @@ directory, the OS environment, and default arguments to the
 
 ```elixir
 config :dart_sass,
-  version: "1.61.0",
+  version: "1.77.5",
   default: [
     args: ~w(css/app.scss ../priv/static/assets/app.css),
     cd: Path.expand("../assets", __DIR__)
@@ -90,7 +90,7 @@ First add it as a dependency in your `mix.exs`:
 def deps do
   [
     {:phoenix, "~> 1.6.0"},
-    {:dart_sass, "~> 0.5", runtime: Mix.env() == :dev}
+    {:dart_sass, "~> 0.7", runtime: Mix.env() == :dev}
   ]
 end
 ```
@@ -100,7 +100,7 @@ compile CSS to the output location `priv/static/assets/app.css`:
 
 ```elixir
 config :dart_sass,
-  version: "1.61.0",
+  version: "1.77.5",
   default: [
     args: ~w(css/app.scss ../priv/static/assets/app.css),
     cd: Path.expand("../assets", __DIR__)
@@ -140,27 +140,6 @@ alias for deployments, which will also use the `--style=compressed` option:
 ```
 
 ## FAQ
-
-### Compatibility with Alpine Linux (`mix sass default` exited with 2)
-
-> Note: Using [glibc on Alpine Linux](https://ariadne.space/2021/08/26/there-is-no-such-thing-as-a-glibc-based-alpine-image/) is **not recommended**. Proceed at your own risk.
-
-Dart-native executables rely on [glibc](https://www.gnu.org/software/libc/) to be present. Because Alpine Linux uses [musl](https://musl.libc.org/) instead, you have to add the package [alpine-pkg-glibc](https://github.com/sgerrand/alpine-pkg-glibc) to your installation. Follow the installation guide in the README.
-
-For example, add the following to your Dockerfile before you
-run `mix sass`:
-
-```Dockerfile
-ENV GLIBC_VERSION=2.34-r0
-RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
-    wget -q -O /tmp/glibc.apk https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-${GLIBC_VERSION}.apk && \
-    apk add /tmp/glibc.apk && \
-    rm -rf /tmp/glibc.apk
-```
-
-In case you get the error `../../runtime/bin/eventhandler_linux.cc: 412: error: Failed to start event handler thread 1`, it means that your Docker installation or the used Docker-in-Docker image, is using a version below Docker 20.10.6. This error is related to an [updated version of the musl library](https://about.gitlab.com/blog/2021/08/26/its-time-to-upgrade-docker-engine). It can be resolved by using the [alpine-pkg-glibc](https://github.com/sgerrand/alpine-pkg-glibc) with the version 2.33 instead of 2.34.
-
-Notes: The Alpine package gcompat vs libc6-compat will not work.
 
 ### Watchers and Bash
 
